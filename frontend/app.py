@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "http://backend:8000"
+API_URL = "http://localhost:8000"
 
 st.set_page_config(page_title="Banking RAG Chatbot", layout="wide")
 
@@ -15,7 +15,7 @@ if "data_uploaded" not in st.session_state:
 
 # ---------------- LOGIN ----------------
 def login_ui():
-    st.title("🔐 Login")
+    st.title("Login")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
