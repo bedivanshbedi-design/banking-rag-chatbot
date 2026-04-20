@@ -13,6 +13,7 @@ if "data_uploaded" not in st.session_state:
     st.session_state.data_uploaded = False
 
 
+# ---------------- LOGIN UI ----------------
 def login_ui():
     st.title("Login")
 
@@ -23,7 +24,7 @@ def login_ui():
         with st.spinner("Logging in..."):
             try:
                 res = requests.post(
-                    f"{API_URL}/token",   # ✅ CORRECT ENDPOINT
+                    f"{API_URL}/token",
                     data={
                         "username": username,
                         "password": password
@@ -31,7 +32,7 @@ def login_ui():
                     timeout=60
                 )
 
-                # 🔍 DEBUG
+                # Debug
                 st.write("Status:", res.status_code)
                 st.write("Response:", res.text)
 
@@ -45,7 +46,6 @@ def login_ui():
                         st.rerun()
                     else:
                         st.error("No token received ❌")
-
                 else:
                     st.error("Invalid credentials ❌")
 
@@ -116,33 +116,33 @@ def main_app():
         st.warning("⚠️ Please upload dataset from sidebar to enable chat")
 
     if st.button("Ask"):
-    if not st.session_state.data_uploaded:
-        st.warning("Upload dataset first ❗")
-        return
+        if not st.session_state.data_uploaded:
+            st.warning("Upload dataset first ❗")
+            return
 
-    if query.strip() == "":
-        st.warning("Please enter a question")
-        return
+        if query.strip() == "":
+            st.warning("Please enter a question")
+            return
 
-    with st.spinner("Thinking..."):
-        try:
-            res = requests.post(
-                f"{API_URL}/chat",
-                json={"query": query},
-                headers=headers,
-                timeout=60
-            )
+        with st.spinner("Thinking..."):
+            try:
+                res = requests.post(
+                    f"{API_URL}/chat",
+                    json={"query": query},
+                    headers=headers,
+                    timeout=60
+                )
 
-            if res.status_code == 200:
-                data = res.json()
-                st.success(data.get("response", "No response"))
-            else:
-                st.error(f"Error: {res.status_code}")
-                st.text(res.text)
+                # ✅ FIXED INDENTATION HERE
+                if res.status_code == 200:
+                    data = res.json()
+                    st.success(data.get("response", "No response"))
+                else:
+                    st.error(f"Error: {res.status_code}")
+                    st.text(res.text)
 
-        except Exception as e:
-            st.error(f"Error: {e}")
-
+            except Exception as e:
+                st.error(f"Error: {e}")
 
 
 # ---------------- ROUTER ----------------
@@ -150,4 +150,3 @@ if not st.session_state.token:
     login_ui()
 else:
     main_app()
-    
