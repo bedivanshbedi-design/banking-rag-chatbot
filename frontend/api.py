@@ -1,6 +1,6 @@
 import requests
 
-API_URL = "http://localhost:8000"
+API_URL = "https://banking-rag-chatbot-2.onrender.com"
 
 if "token" not in st.session_state:
     with st.spinner("Logging in..."):
