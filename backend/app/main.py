@@ -8,6 +8,10 @@ df = None
 
 app = FastAPI()
 
+@app.get("/")
+def home():
+    return {"message": "Backend is running"}
+
 ALLOWED_EXTENSIONS = [".csv", ".xlsx"]
 
 def validate_file(filename: str):
