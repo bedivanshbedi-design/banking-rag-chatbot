@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "https://banking-rag-chatbot.onrender.com"
+API_URL = "https://banking-rag-chatbot-1.onrender.com"
 
 st.set_page_config(page_title="Banking RAG Chatbot", layout="wide")
 
@@ -13,7 +13,6 @@ if "data_uploaded" not in st.session_state:
     st.session_state.data_uploaded = False
 
 
-# ---------------- LOGIN ----------------
 def login_ui():
     st.title("Login")
 
@@ -24,9 +23,17 @@ def login_ui():
         with st.spinner("Logging in..."):
             try:
                 res = requests.post(
-                    f"{API_URL}/token",
-                    data={"username": username, "password": password}
+                    f"{API_URL}/login",   # ✅ CORRECT ENDPOINT
+                    json={
+                        "username": username,
+                        "password": password
+                    },
+                    timeout=10
                 )
+
+                # 🔍 DEBUG
+                st.write("Status:", res.status_code)
+                st.write("Response:", res.text)
 
                 if res.status_code == 200:
                     data = res.json()
@@ -119,11 +126,7 @@ def main_app():
 
         with st.spinner("Thinking..."):
             try:
-                res = requests.post(
-                    f"{API_URL}/chat",
-                    json={"query": query},
-                    headers=headers
-                )
+                
 
                 if res.status_code == 200:
                     data = res.json()
@@ -141,3 +144,4 @@ if not st.session_state.token:
     login_ui()
 else:
     main_app()
+    

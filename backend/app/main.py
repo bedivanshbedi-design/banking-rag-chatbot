@@ -43,7 +43,7 @@ async def upload_file(file: UploadFile = File(...)):
         # Convert to dataframe
         df = pd.read_csv(io.BytesIO(content))
 
-        print("✅ DF Loaded:", df.shape)
+        print(" DF Loaded:", df.shape)
 
         return {"message": "Upload successful"}
 
@@ -107,7 +107,7 @@ async def chat(query: dict):
         print("User query:", q)
 
         if df is None:
-            return {"response": "⚠️ No dataset uploaded"}
+            return {"response": "No dataset uploaded"}
 
         # ✅ columns
         if "column" in q:
@@ -123,7 +123,7 @@ async def chat(query: dict):
         if "first" in q or "sample" in q:
             return {"response": str(df.head(3))}
 
-        return {"response": "🤖 I understand basic data queries now!"}
+        return {"response": "I understand basic data queries now!"}
 
     except Exception as e:
         print("ERROR:", str(e))
