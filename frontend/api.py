@@ -1,6 +1,6 @@
 import requests
 
-API_URL = "API_URL = "API_URL = "https://your-deployed-backend-url""
+API_URL = "http://localhost:8000"
 
 if "token" not in st.session_state:
     with st.spinner("Logging in..."):

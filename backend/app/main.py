@@ -2,7 +2,7 @@ from fastapi import FastAPI, BackgroundTasks, UploadFile, File, HTTPException
 import os
 from rag.ingestion import process_file
 from fastapi import Depends
-from backend.app.auth import get_current_user
+# from backend.app.auth import get_current_user
 
 df = None
 
@@ -41,7 +41,10 @@ async def upload_file(file: UploadFile = File(...)):
         content = await file.read()
 
         # Convert to dataframe
-        df = pd.read_csv(io.BytesIO(content))
+        if file.filename.endswith(".csv"):
+            df = pd.read_csv(io.BytesIO(content))
+        else:
+            df = pd.read_excel(io.BytesIO(content))
 
         print(" DF Loaded:", df.shape)
 
@@ -50,6 +53,7 @@ async def upload_file(file: UploadFile = File(...)):
     except Exception as e:
         print("UPLOAD ERROR:", str(e))
         return {"message": f"Error: {str(e)}"}
+    
 from fastapi import Body
 from rag.query_engine import run_query
 from rag.intent import is_aggregation_query
@@ -75,7 +79,7 @@ graph = None
 def get_graph():
     global graph
     if graph is None:
-        print("⚡ Initializing graph...")
+        print("Initializing graph...")
         graph = build_graph()
     return graph
 
@@ -84,49 +88,36 @@ from rag.query_engine import run_query
 # from rag.ingestion import data_store
 
 from rag.state import data_store   # ✅ SAME SOURCE
-from backend.app.auth import get_current_user
+# from backend.app.auth import get_current_user
 
-# @app.post("/chat")
-# async def chat(data: dict, current_user: str = Depends(get_current_user)):
-#     print("User:", query)
-#     try:
-#         print("Data store in chat:", data_store.keys())
+from pydantic import BaseModel
 
-#         if not data_store:
-#             return {"response": "No data uploaded yet"}
-
-#         query = data.get("query")
-
-#         result = run_query(query)
-
-#         return {"response": result.to_string(index=False)}
-
-#     except Exception as e:
-#         return {"response": str(e)}
-
+class QueryRequest(BaseModel):
+    query: str
+    
 @app.post("/chat")
-async def chat(query: dict):
+async def chat(req: QueryRequest):
     try:
         global df
 
-        q = query.get("query").lower()
+        q = req.query.lower()
 
         print("User query:", q)
 
         if df is None:
             return {"response": "No dataset uploaded"}
 
-        # ✅ columns
+        # columns
         if "column" in q:
             return {"response": str(list(df.columns))}
 
-        # ✅ dataset summary
+        # dataset summary
         if "dataset" in q or "about" in q:
             return {
                 "response": f"This dataset has {df.shape[0]} rows and {df.shape[1]} columns: {list(df.columns)}"
             }
 
-        # ✅ first rows
+        # first rows
         if "first" in q or "sample" in q:
             return {"response": str(df.head(3))}
 

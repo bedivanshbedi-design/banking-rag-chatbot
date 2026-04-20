@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "https://banking-rag-chatbot-2.onrender.com"
+API_URL = "http://localhost:8000"
 
 st.set_page_config(page_title="Banking RAG Chatbot", layout="wide")
 
@@ -23,8 +23,8 @@ def login_ui():
         with st.spinner("Logging in..."):
             try:
                 res = requests.post(
-                    f"{API_URL}/login",   # ✅ CORRECT ENDPOINT
-                    json={
+                    f"{API_URL}/token",   # ✅ CORRECT ENDPOINT
+                    data={
                         "username": username,
                         "password": password
                     },
@@ -116,27 +116,33 @@ def main_app():
         st.warning("⚠️ Please upload dataset from sidebar to enable chat")
 
     if st.button("Ask"):
-        if not st.session_state.data_uploaded:
-            st.warning("Upload dataset first ❗")
-            return
+    if not st.session_state.data_uploaded:
+        st.warning("Upload dataset first ❗")
+        return
 
-        if query.strip() == "":
-            st.warning("Please enter a question")
-            return
+    if query.strip() == "":
+        st.warning("Please enter a question")
+        return
 
-        with st.spinner("Thinking..."):
-            try:
-                
+    with st.spinner("Thinking..."):
+        try:
+            res = requests.post(
+                f"{API_URL}/chat",
+                json={"query": query},
+                headers=headers,
+                timeout=60
+            )
 
-                if res.status_code == 200:
-                    data = res.json()
-                    st.success(data.get("response", "No response"))
-                else:
-                    st.error(f"Error: {res.status_code}")
-                    st.text(res.text)
+            if res.status_code == 200:
+                data = res.json()
+                st.success(data.get("response", "No response"))
+            else:
+                st.error(f"Error: {res.status_code}")
+                st.text(res.text)
 
-            except Exception as e:
-                st.error(f"Error: {e}")
+        except Exception as e:
+            st.error(f"Error: {e}")
+
 
 
 # ---------------- ROUTER ----------------
