@@ -70,11 +70,18 @@ async def query_api(payload: dict = Body(...)):
 
 from agents.graph import build_graph
 
-graph = build_graph()
+graph = None
+
+def get_graph():
+    global graph
+    if graph is None:
+        print("⚡ Initializing graph...")
+        graph = build_graph()
+    return graph
 
 from fastapi.responses import JSONResponse
 from rag.query_engine import run_query
-from rag.ingestion import data_store
+# from rag.ingestion import data_store
 
 from rag.state import data_store   # ✅ SAME SOURCE
 from backend.app.auth import get_current_user
@@ -124,10 +131,6 @@ async def chat(query: dict):
             return {"response": str(df.head(3))}
 
         return {"response": "I understand basic data queries now!"}
-
-    except Exception as e:
-        print("ERROR:", str(e))
-        return {"response": f"Error: {str(e)}"}
 
     except Exception as e:
         print("ERROR:", str(e))
