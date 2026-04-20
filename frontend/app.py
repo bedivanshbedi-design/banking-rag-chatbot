@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_URL = "https://banking-rag-chatbot-1.onrender.com"
+API_URL = "https://banking-rag-chatbot-2.onrender.com"
 
 st.set_page_config(page_title="Banking RAG Chatbot", layout="wide")
 
@@ -28,7 +28,7 @@ def login_ui():
                         "username": username,
                         "password": password
                     },
-                    timeout=10
+                    timeout=60
                 )
 
                 # 🔍 DEBUG

@@ -13,3 +13,5 @@ openai
 duckdb
 cryptography
 httpx
+python-jose
+python-jose[cryptography]
